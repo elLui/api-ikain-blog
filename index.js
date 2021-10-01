@@ -24,31 +24,16 @@ mongoose.connect(process.env.IRIS_KAIN_DB_URL)
 // current route list -- start
 
 const authRoute = require("./routes/auth")
+const userRoute = require("./routes/users")
+const postRoute = require("./routes/posts")
+
 
 // current route list -- end
 
 
-
-
-
-
-
-
 app.use("/api/auth", authRoute);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+app.use("/api/users", userRoute);
+app.use("/api/posts", postRoute);
 
 
 
