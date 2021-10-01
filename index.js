@@ -9,6 +9,9 @@ const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
 
+// enable json for parsing in postman :P
+app.use(express.json());
+
 const mongoose = require('mongoose');
 mongoose.connect(process.env.IRIS_KAIN_DB_URL)
     .then(console.log("connected to mongoDB cloud server"))
@@ -18,6 +21,11 @@ mongoose.connect(process.env.IRIS_KAIN_DB_URL)
 
 // mongoDB connection -- end
 
+// current route list -- start
+
+const authRoute = require("./routes/auth")
+
+// current route list -- end
 
 
 
@@ -26,6 +34,7 @@ mongoose.connect(process.env.IRIS_KAIN_DB_URL)
 
 
 
+app.use("/api/auth", authRoute);
 
 
 
