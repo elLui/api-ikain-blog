@@ -20,12 +20,10 @@ router.post("/", async (req, res) => {
 
 
 // UPDATE POST
-router.get("/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        if (post.username === req.params.id) {
-
-
+        if (post.username === req.body.username) {
             try {
                 const updatedPost = await Post.findByIdAndUpdate(
                     req.params.id,
@@ -44,40 +42,65 @@ router.get("/:id", async (req, res) => {
     } catch (err) {
         res.status(500).json(err);
     }
-    });
+});
 
 
-// DELETE POST
-    router.delete("/:id", async (req, res) => {
-        // before allowing update compare current user _id to User record before updating
-        if (req.body.userId === req.params.id) {
+//DELETE POST
+router.delete("/:id", async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (post.username === req.body.username) {
             try {
-
-                // find all post by user
-                const user = await User.findById(req.params.id);
-
-                try {
-
-                    // delete all post by user
-                    await Post.deleteMany({username: user.username});
-
-                    // delete User
-                    await User.findByIdAndDelete(req.params.id);
-                    res.status(200).json("User has been deleted.");
-                } catch (err) {
-                    res.status(500).json(err);
-                }
+                await post.delete();
+                res.status(200).json("Post has been deleted...");
             } catch (err) {
-                res.status(404).json("User not found.")
+                res.status(500).json(err);
             }
-
-
         } else {
-            res.status(401).json("You may only delete your account.");
+            res.status(401).json("You can delete only your post!");
         }
-    });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
-// GET POST
+//GET POST
+router.get("/:id", async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
+//GET ALL POSTS
+router.get("/", async (req, res) => {
+    const username = req.query.user;
+    const catName = req.query.categories;
+    try {
+        // create a post array
+        let posts;
+        // if username is valid
+        if (username) {
+            // posts array (using await) search Post table for all username related post
+            posts = await Post.find({username});
+            // filtering by category
+        } else if (catName) {
+            posts = await Post.find({
+                categories: {
+                    // if category is located on a post it is added to the array
+                    $in: [catName],
+                },
+            });
+        } else {
+            // if not data is entered all post are returned
+            posts = await Post.find();
+        }
+        res.status(200).json(posts);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
-    module.exports = router;
+module.exports = router;
